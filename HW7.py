@@ -119,7 +119,12 @@ def birthyear_nationality_search(age, country, cur, conn):
     # HINT: You'll have to use JOIN for this task.
 
 def position_birth_search(position, age, cur, conn):
-       pass
+       birthyear = 2023 - age
+       cur.execute("""SELECT name, Positions.position, birthyear FROM Players
+                   JOIN Positions ON Players.position_id = Positions.id
+                   WHERE position = ? AND birthyear > ?""",
+                   (position, birthyear))
+       return cur.fetchall()
 
 
 # [EXTRA CREDIT]
@@ -206,7 +211,7 @@ class TestAllMethods(unittest.TestCase):
         self.assertEqual(a[3][2], 1992)
         self.assertEqual(len(a[1]), 3)
 
-    def test_type_speed_defense_search(self):
+    def test_position_birth_search(self):
         b = sorted(position_birth_search('Goalkeeper', 35, self.cur, self.conn))
         self.assertEqual(len(b), 2)
         self.assertEqual(type(b[0][0]), str)
