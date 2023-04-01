@@ -1,8 +1,7 @@
-
-# Your name:
-# Your student id:
-# Your email:
-# List who you have worked with on this project:
+# Your name: Paul Chafetz
+# Your student id: 17039004
+# Your email: pchafetz@umich.edu
+# List who you have worked with on this project: N/A
 
 import unittest
 import sqlite3
@@ -53,7 +52,15 @@ def make_positions_table(data, cur, conn):
 #     created for you -- see make_positions_table above for details.
 
 def make_players_table(data, cur, conn):
-    pass
+    cur.execute("""CREATE TABLE IF NOT EXISTS Players
+                (id INTEGER PRIMARY KEY, name TEXT, position_id INTEGER, birthyear INTEGER, nationality INTEGER)
+                """)
+    for player in data['squad']:
+        cur.execute("SELECT id FROM Positions WHERE position = ?", (player['position'],))
+        pos_id = cur.fetchone()[0]
+        cur.execute("INSERT OR IGNORE INTO Players (id, name, position_id, birthyear, nationality) VALUES (?,?,?,?,?)",
+                    (player["id"], player["name"], pos_id, player["dateOfBirth"][:4], player["nationality"]))
+    conn.commit()
 
 ## [TASK 2]: 10 points
 # Finish the function nationality_search
