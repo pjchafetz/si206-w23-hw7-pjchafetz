@@ -163,8 +163,14 @@ def position_birth_search(position, age, cur, conn):
 #     the passed year. 
 
 def make_winners_table(data, cur, conn):
-    pass
-
+    cur.execute("""CREATE TABLE IF NOT EXISTS Winners
+                (id INTEGER PRIMARY KEY, name TEXT)""")
+    for season in data["seasons"]:
+        if season["winner"]:
+            cur.execute("""INSERT OR IGNORE INTO Winners (id, name)
+                        VALUES (?,?)""", (season["winner"]["id"], season["winner"]["name"]))
+    conn.commit()
+    
 def make_seasons_table(data, cur, conn):
     pass
 
@@ -185,7 +191,7 @@ class TestAllMethods(unittest.TestCase):
         players_list = self.cur.fetchall()
 
         self.assertEqual(len(players_list), 30)
-        self.assertEqual(len(players_list[0]),5)
+        self.assertEqual(len(players_list[0]), 5)
         self.assertIs(type(players_list[0][0]), int)
         self.assertIs(type(players_list[0][1]), str)
         self.assertIs(type(players_list[0][2]), int)
@@ -228,7 +234,12 @@ class TestAllMethods(unittest.TestCase):
         self.cur2.execute('SELECT * from Winners')
         winners_list = self.cur2.fetchall()
 
-        pass
+        self.assertEqual(len(winners_list), 7)
+        self.assertEqual(len(winners_list[0]), 2)
+        self.assertIs(type(winners_list[0][0]), int)
+        self.assertIs(type(winners_list[0][1]), str)
+        self.assertTupleEqual(winners_list[3], (64, 'Liverpool FC'))
+        self.assertTupleEqual(winners_list[6], (338, 'Leicester City FC'))
 
     def test_make_seasons_table(self):
         self.cur2.execute('SELECT * from Seasons')
